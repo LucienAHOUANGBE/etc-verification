@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Vérification d'attestation - ETC</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #e5e5e5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 30px 15px;
+        }
+
+        /* ---------- Bandeau de statut (au-dessus du "certificat") ---------- */
+        .statut {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .statut.valide { background: #e3f5e8; color: #1a7a3c; }
+        .statut.invalide { background: #fbe7e6; color: #b3261e; }
+
+        /* ---------- Reprise du design du vrai certificat ---------- */
+        .certificate {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            aspect-ratio: 1123 / 794;
+            background: #ffffff;
+            overflow: hidden;
+            text-align: center;
+            padding: 4% 7%;
+            border-radius: 4px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .corner {
+            position: absolute;
+            width: 8%;
+            padding-top: 8%;
+            background: #5b1a4a;
+        }
+        .corner-top-left { top: 0; left: 0; clip-path: polygon(0 0, 100% 0, 0 100%); }
+        .corner-top-right { top: 0; right: 0; clip-path: polygon(100% 0, 100% 100%, 0 0); }
+        .corner-bottom-left { bottom: 0; left: 0; clip-path: polygon(0 100%, 0 0, 100% 100%); }
+        .corner-bottom-right { bottom: 0; right: 0; clip-path: polygon(100% 100%, 0 100%, 100% 0); }
+
+        .logo-etc { height: 8%; position: relative; z-index: 2; margin-bottom: 1%; }
+
+        .content { position: relative; z-index: 2; }
+        .content h1 { font-size: clamp(18px, 3.2vw, 34px); font-weight: 700; margin-bottom: 2%; }
+        .content p { font-size: clamp(11px, 1.3vw, 15px); line-height: 1.5; color: #222; margin-bottom: 1%; }
+
+        .student-name { font-size: clamp(16px, 2.4vw, 26px); font-weight: 700; margin: 2% 0 1%; }
+        .italic { font-style: italic; }
+        .training-name { font-size: clamp(14px, 1.9vw, 20px); font-weight: 700; margin: 1.5% 0; }
+
+        .location-date {
+            position: relative; z-index: 2;
+            border-top: 1px solid #5b1a4a;
+            width: 45%;
+            margin: 3% auto 0;
+            padding-top: 1%;
+            font-size: clamp(10px, 1.1vw, 13px);
+        }
+
+        .certificate-number {
+            position: absolute; bottom: 4%; right: 4%; z-index: 2;
+            font-size: clamp(8px, 0.85vw, 10px); color: #333; text-align: center;
+        }
+
+        .loading, .placeholder { color: #666; padding: 60px 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="statut" id="statut" style="display:none;"></div>
+
+    <div class="certificate" id="certificate">
+        <div class="corner corner-top-left"></div>
+        <div class="corner corner-top-right"></div>
+        <div class="corner corner-bottom-left"></div>
+        <div class="corner corner-bottom-right"></div>
+
+        <img class="logo-etc" src="logo-etc.png" alt="Excellent Training Center">
+
+        <div class="content" id="contenu-certificat">
+            <p class="loading">Vérification en cours...</p>
+        </div>
+    </div>
+
+    <script>
+        const URL_SHEETS_CSV = "https://docs.google.com/spreadsheets/d/VOTRE_ID/pub?output=csv";
+
+        function afficherStatut(texte, classe) {
+            const statut = document.getElementById("statut");
+            statut.textContent = texte;
+            statut.className = "statut " + classe;
+            statut.style.display = "block";
+        }
+
+        async function verifierAttestation() {
+            const zoneContenu = document.getElementById("contenu-certificat");
+
+            const chemin = window.location.pathname;
+            const token = chemin.split("/verifier/")[1] || new URLSearchParams(window.location.search).get("token");
+
+            if (!token) {
+                zoneContenu.innerHTML = `<p class="placeholder">Aucun code de vérification fourni.</p>`;
+                return;
+            }
+
+            try {
+                const reponse = await fetch(URL_SHEETS_CSV);
+                const texteCsv = await reponse.text();
+                const resultat = Papa.parse(texteCsv, { header: true, skipEmptyLines: true });
+                const attestation = resultat.data.find(ligne => ligne.token === token);
+
+                if (!attestation) {
+                    afficherStatut("❌ Attestation introuvable — aucun enregistrement ne correspond à ce code.", "invalide");
+                    zoneContenu.innerHTML = `<p class="placeholder">—</p>`;
+                    return;
+                }
+
+                if (attestation.revoked === "TRUE") {
+                    afficherStatut("⚠️ Cette attestation a été révoquée / invalidée.", "invalide");
+                }else {
+                    afficherStatut("✅ Attestation vérifiée et authentique.", "valide");
+                }
+
+                // Remplit le "certificat" avec les vraies données, comme le PDF original
+                zoneContenu.innerHTML = `
+                    <h1>ATTESTATION DE RÉUSSITE</h1>
+                    <p>Excellent Training Center (ETC) certifie,<br>
+                    par l'intermédiaire du programme Econometrics and Data Analysis (EcoDA), que</p>
+                    <h2 class="student-name">${attestation.student_name}</h2>
+                    <p class="italic">a suivi avec succès et validé la formation</p>
+                    <h3 class="training-name">${attestation.training_title}</h3>
+                    <p>Période :<br>${attestation.start_date} – ${attestation.end_date}</p>
+                    <div class="location-date">
+                        <p>Vérifié en ligne le ${new Date().toLocaleDateString("fr-FR")}</p>
+                    </div>
+                    <div class="certificate-number">
+                        <p>Numéro :</p>
+                        <p>${attestation.certificate_number}</p>
+                    </div>
+                `;
+            } catch (erreur) {
+                afficherStatut("❌ Erreur technique lors de la vérification.", "invalide");
+                console.error(erreur);
+            }
+        }
+
+        verifierAttestation();
+    </script>
+
+</body>
+</html>
