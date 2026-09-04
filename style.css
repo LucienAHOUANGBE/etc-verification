@@ -1,0 +1,107 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #e5e5e5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 30px 15px;
+        }
+
+        /* ---------- Bandeau de statut (au-dessus du "certificat") ---------- */
+        .statut {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .statut.valide { background: #e3f5e8; color: #1a7a3c; }
+        .statut.invalide { background: #fbe7e6; color: #b3261e; }
+
+        /* ---------- Reprise du design du vrai certificat ---------- */
+        .certificate {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            min-height: 500px;
+            background: #ffffff;
+            text-align: center;
+            padding: 2% 2% 3%;
+            border-radius: 4px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .corner {
+            position: absolute;
+            width: 8%;
+            padding-top: 8%;
+            background: #5b1a4a;
+        }
+        .corner-top-left { top: 0; left: 0; clip-path: polygon(0 0, 100% 0, 0 100%); }
+        .corner-top-right { top: 0; right: 0; clip-path: polygon(100% 0, 100% 100%, 0 0); }
+        .corner-bottom-left { bottom: 0; left: 0; clip-path: polygon(0 100%, 0 0, 100% 100%); }
+        .corner-bottom-right { bottom: 0; right: 0; clip-path: polygon(100% 100%, 0 100%, 100% 0); }
+
+        .logo-etc { height: 80px; position: relative; z-index: 2; margin-bottom: 0px; }
+
+        .watermark {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);  /* centre parfait, peu importe la taille */
+            width: 40%;      /* relatif à la largeur de .certificate, reste responsive */
+            opacity: 0.06;   /* même transparence que sur le PDF original */
+            z-index: 0;      /* derrière le texte (qui est en z-index:2) */
+            pointer-events: none;  /* ne gêne pas les clics/sélection de texte */
+        }
+
+        .content { position: relative; z-index: 2; }
+        .content h1 { font-size: clamp(18px, 3.2vw, 34px); font-weight: 700; margin-bottom: 2%; }
+        .content p { font-size: clamp(11px, 1.3vw, 15px); line-height: 1.5; color: #222; margin-bottom: 1%; }
+
+        .student-name { font-size: clamp(16px, 2.4vw, 26px); font-weight: 700; margin: 2% 0 1%; }
+        .italic { font-style: italic; }
+        .training-name { font-size: clamp(14px, 1.9vw, 20px); font-weight: 700; margin: 1.5% 0; }
+
+        
+
+        .loading, .placeholder { color: #666; padding: 60px 20px; }
+
+        .footer {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            text-align: top;
+            margin-top: 4%;
+            padding: 0 20px;
+        }
+
+        .location-date {
+            position: relative; z-index: 2;
+            width: 45%;
+            text-align: center;
+            margin: 0% auto 0;
+            padding-top: 1%;
+            font-size: clamp(10px, 1.1vw, 13px);
+        }
+
+        .location-date hr {border: none; border-top: 2px solid #5b1a4a; margin: 0px auto 2px; width: 80%; }
+        .location-date p { font-size: clamp(9px, 1vw, 12px); margin: 2px 2px; }
+
+        .certificate-number {
+            text-align: right;
+            margin-top: 2%;
+            font-size: clamp(9px, 1vw, 11px);
+            color: #333;
+        }
+
+        .signature-block { width: 30%; text-align: center; position: relative; }
+        .signature-block .name { font-weight: 700; font-size: clamp(10px, 1.1vw, 12px); margin-bottom: 2px; }
+        .signature-block p { font-size: clamp(9px, 1vw, 12px); margin-bottom: 2px; }
+        .signature-block hr { border: none; border-top: 2px solid #5b1a4a; margin: 6px auto 8px; width: 80%; }
