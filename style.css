@@ -67,21 +67,6 @@
         .italic { font-style: italic; }
         .training-name { font-size: clamp(14px, 1.9vw, 20px); font-weight: 700; margin: 1.5% 0; }
 
-        
-
-        .loading, .placeholder { color: #666; padding: 60px 20px; }
-
-        .footer {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            text-align: top;
-            margin-top: 4%;
-            padding: 0 20px;
-        }
-
         .location-date {
             position: relative; z-index: 2;
             width: 45%;
@@ -97,8 +82,50 @@
         .certificate-number {
             text-align: right;
             margin-top: 2%;
+            margin-left: 2%;
             font-size: clamp(9px, 1vw, 11px);
             color: #333;
+            font-family: 'JetBrains Mono', 'Consolas', 'Menlo', 'Courier New', monospace;
+            font-feature-settings: "zero" 1;  /* active le zéro barré si la police le supporte */
+            letter-spacing: 0.5px;
+        }
+
+        .skills {
+            margin-top: 2.5%;
+        }
+        .skills-label {
+            font-weight: 700;
+            font-size: clamp(9px, 1.1vw, 12px);
+            color: #5b1a4a;
+            margin-bottom: 6px;
+        }
+        .skills-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+        }
+        .skill-tag {
+            font-size: clamp(8px, 0.95vw, 10.5px);
+            background: rgba(91, 26, 74, 0.08);
+            color: #5b1a4a;
+            border: 1px solid rgba(91, 26, 74, 0.3);
+            border-radius: 12px;
+            padding: 3px 10px;
+            white-space: nowrap;
+        }
+        
+        .loading, .placeholder { color: #666; padding: 60px 20px; }
+
+        .footer {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            text-align: top;
+            margin-top: 4%;
+            padding: 0 20px;
         }
 
         .signature-block { width: 30%; text-align: center; position: relative; }

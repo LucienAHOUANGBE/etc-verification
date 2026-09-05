@@ -79,6 +79,7 @@ async function verifierAttestation() {
                 start_date: formaterDate(attestation_raw['Date de debut']),
                 end_date: formaterDate(attestation_raw['Date de cloture']),
                 success_date: formaterDate(attestation_raw['Date de remise']),
+                skills: (attestation_raw['skills'] || '').split(";").map(e => e.trim()).filter(Boolean),
                 programm: attestation_raw['Nom du programme'],
                 location: {
                     city: attestation_raw['Location'],
@@ -103,19 +104,28 @@ async function verifierAttestation() {
         // Remplit le "certificat" avec les vraies données, comme le PDF original
         zoneContenu.innerHTML = `
             <h1>ATTESTATION DE RÉUSSITE</h1>
-
+ 
             <p>Excellent Training Center (ETC) certifie,<br>
             par l'intermédiaire du programme Econometrics and Data Analysis (EcoDA), que</p>
-
+ 
             <h2 class="student-name">${attestation.fullName}</h2>
-
+ 
             <p class="italic">a suivi avec succès et validé la formation</p>
-
+ 
             <h3 class="training-name">${attestation.training.title}</h3>
-
+ 
             <p>Durée : ${attestation.training.duration.value} ${attestation.training.duration.unit}</p>
             <p>Période :<br> ${attestation.training.start_date} – ${attestation.training.end_date}</p>
-
+ 
+            ${attestation.training.skills.length ? `
+            <div class="skills">
+                <p class="skills-label">Compétences validées</p>
+                <div class="skills-tags">
+                    ${attestation.training.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+                </div>
+            </div>
+            ` : ''}
+ 
             <!-- Pied de page : signatures -->
             <div class="footer">
                 <div class="signature-block trainer">
@@ -124,13 +134,13 @@ async function verifierAttestation() {
                     <p>${attestation.trainer.title}</p>
                     <p>${attestation.trainer.institution}</p>
                 </div>
-
+ 
                 <!-- Ligne date + lieu -->
                 <div class="location-date">
                     <hr>
                     <p>${attestation.training.location.city} - ${attestation.training.location.country}, le ${attestation.training.success_date}</p>
                 </div>
-
+ 
                 <div class="signature-block director">
                     <hr>
                     <p class="name">${attestation.director.full_name}</p>
@@ -138,10 +148,11 @@ async function verifierAttestation() {
                     <p>${attestation.director.institution}</p>
                 </div>
             </div>
-
+ 
             <div class="certificate-number">
                 Numéro : ${attestation.certificate_number}
             </div>
+
         `;
     } catch (erreur) {
         afficherStatut("❌ Erreur technique lors de la vérification.", "invalide");
